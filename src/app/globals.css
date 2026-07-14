@@ -1,26 +1,244 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
+/* next-themes toggles the `.dark` class on <html>. */
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================================
+   DESIGN TOKENS — the single source of truth for the whole application.
+   Change appearance here, not in components. All values are semantic.
+   ========================================================================== */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Radius scale */
+  --radius: 0.625rem;
+
+  /* Surfaces & content */
+  --background: oklch(0.99 0 0);
+  --foreground: oklch(0.21 0.006 285.9);
+  --surface: oklch(1 0 0);
+  --surface-foreground: oklch(0.21 0.006 285.9);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.21 0.006 285.9);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.21 0.006 285.9);
+
+  /* Brand / primary (calm, near-black — Vercel/GitHub feel) */
+  --primary: oklch(0.21 0.006 285.9);
+  --primary-foreground: oklch(0.985 0 0);
+
+  /* Secondary / muted / accent (neutral) */
+  --secondary: oklch(0.967 0.001 286.4);
+  --secondary-foreground: oklch(0.21 0.006 285.9);
+  --muted: oklch(0.967 0.001 286.4);
+  --muted-foreground: oklch(0.552 0.014 285.9);
+  --accent: oklch(0.967 0.001 286.4);
+  --accent-foreground: oklch(0.21 0.006 285.9);
+
+  /* Brand accent — links, logo, focus ring (refined indigo) */
+  --brand: oklch(0.55 0.2 277);
+  --brand-foreground: oklch(0.985 0 0);
+
+  /* Status */
+  --success: oklch(0.62 0.17 149);
+  --success-foreground: oklch(0.985 0 0);
+  --warning: oklch(0.72 0.17 68);
+  --warning-foreground: oklch(0.26 0.05 68);
+  --error: oklch(0.58 0.22 27.3);
+  --error-foreground: oklch(0.985 0 0);
+  --info: oklch(0.6 0.16 254);
+  --info-foreground: oklch(0.985 0 0);
+  /* Alias kept for shadcn parity */
+  --destructive: var(--error);
+
+  /* Lines & focus */
+  --border: oklch(0.92 0.004 286.3);
+  --input: oklch(0.92 0.004 286.3);
+  --ring: oklch(0.55 0.2 277);
+
+  /* Elevation (subtle, premium) */
+  --shadow-color: 285 20% 40%;
+  --shadow-xs: 0 1px 2px 0 hsl(var(--shadow-color) / 0.04);
+  --shadow-sm: 0 1px 3px 0 hsl(var(--shadow-color) / 0.06), 0 1px 2px -1px hsl(var(--shadow-color) / 0.06);
+  --shadow-md: 0 4px 12px -2px hsl(var(--shadow-color) / 0.08), 0 2px 6px -2px hsl(var(--shadow-color) / 0.06);
+  --shadow-lg: 0 12px 28px -6px hsl(var(--shadow-color) / 0.12), 0 4px 10px -4px hsl(var(--shadow-color) / 0.08);
+  --shadow-xl: 0 24px 48px -12px hsl(var(--shadow-color) / 0.18);
+
+  /* Motion */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+  --duration-slow: 320ms;
+
+  /* Layout — container width + z-index scale (theme-independent) */
+  --spacing-container: 72rem;
+  --z-base: 0;
+  --z-dropdown: 40;
+  --z-sticky: 50;
+  --z-overlay: 60;
+  --z-modal: 70;
+  --z-toast: 80;
 }
 
+.dark {
+  --background: oklch(0.16 0.004 285.9);
+  --foreground: oklch(0.985 0 0);
+  --surface: oklch(0.19 0.006 285.9);
+  --surface-foreground: oklch(0.985 0 0);
+  --card: oklch(0.21 0.006 285.9);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.21 0.006 285.9);
+  --popover-foreground: oklch(0.985 0 0);
+
+  --primary: oklch(0.92 0.004 286.3);
+  --primary-foreground: oklch(0.21 0.006 285.9);
+
+  --secondary: oklch(0.27 0.006 286.0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.27 0.006 286.0);
+  --muted-foreground: oklch(0.712 0.013 286.1);
+  --accent: oklch(0.27 0.006 286.0);
+  --accent-foreground: oklch(0.985 0 0);
+
+  --brand: oklch(0.68 0.16 277);
+  --brand-foreground: oklch(0.21 0.006 285.9);
+
+  --success: oklch(0.7 0.16 152);
+  --success-foreground: oklch(0.16 0.02 152);
+  --warning: oklch(0.8 0.16 78);
+  --warning-foreground: oklch(0.24 0.05 68);
+  --error: oklch(0.7 0.19 22.2);
+  --error-foreground: oklch(0.16 0.02 22);
+  --info: oklch(0.7 0.14 254);
+  --info-foreground: oklch(0.16 0.02 254);
+  --destructive: var(--error);
+
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 14%);
+  --ring: oklch(0.68 0.16 277);
+
+  --shadow-color: 285 40% 4%;
+  --shadow-xs: 0 1px 2px 0 hsl(var(--shadow-color) / 0.3);
+  --shadow-sm: 0 1px 3px 0 hsl(var(--shadow-color) / 0.4), 0 1px 2px -1px hsl(var(--shadow-color) / 0.4);
+  --shadow-md: 0 4px 12px -2px hsl(var(--shadow-color) / 0.5), 0 2px 6px -2px hsl(var(--shadow-color) / 0.4);
+  --shadow-lg: 0 12px 28px -6px hsl(var(--shadow-color) / 0.6), 0 4px 10px -4px hsl(var(--shadow-color) / 0.5);
+  --shadow-xl: 0 24px 48px -12px hsl(var(--shadow-color) / 0.7);
+}
+
+/* ============================================================================
+   THEME MAPPING — expose tokens as Tailwind utilities (bg-*, text-*, etc.)
+   ========================================================================== */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--surface);
+  --color-surface-foreground: var(--surface-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-error: var(--error);
+  --color-error-foreground: var(--error-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-destructive: var(--destructive);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Radius scale (8pt-friendly) */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+
+  /* Elevation */
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+
+  /* Type + motion */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --ease-out-quart: var(--ease-out-quart);
+  --ease-emphasized: var(--ease-emphasized);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ============================================================================
+   BASE LAYER
+   ========================================================================== */
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "cv11", "ss01";
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: color-mix(in oklch, var(--brand) 22%, transparent);
+  }
+  /* Consistent, accessible focus ring across all interactive elements. */
+  :focus-visible {
+    @apply outline-none;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ============================================================================
+   TYPOGRAPHY SCALE — semantic, reusable classes (token-based, responsive).
+   ========================================================================== */
+@layer components {
+  .t-display {
+    @apply text-4xl font-semibold tracking-tight text-balance sm:text-5xl;
+    line-height: 1.05;
+  }
+  .t-h1 {
+    @apply text-3xl font-semibold tracking-tight text-balance sm:text-4xl;
+  }
+  .t-h2 {
+    @apply text-2xl font-semibold tracking-tight;
+  }
+  .t-h3 {
+    @apply text-lg font-semibold tracking-tight;
+  }
+  .t-h4 {
+    @apply text-base font-semibold;
+  }
+  .t-body-lg {
+    @apply text-base leading-7 text-muted-foreground;
+  }
+  .t-body {
+    @apply text-sm leading-6;
+  }
+  .t-small {
+    @apply text-sm leading-5;
+  }
+  .t-caption {
+    @apply text-xs leading-5 text-muted-foreground;
+  }
+  .t-eyebrow {
+    @apply text-xs font-medium uppercase tracking-wider text-muted-foreground;
+  }
 }
