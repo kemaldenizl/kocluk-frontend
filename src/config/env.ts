@@ -17,5 +17,4 @@ function required(name: string, value: string | undefined): string {
 
 export const env = {
   backendApiUrl: required("BACKEND_API_URL", process.env.BACKEND_API_URL).replace(/\/$/, ""),
-  defaultTenantId: required("DEFAULT_TENANT_ID", process.env.DEFAULT_TENANT_ID),
 } as const;

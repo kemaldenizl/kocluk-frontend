@@ -8,9 +8,6 @@ export const COOKIE_NAMES = {
   refreshToken: "refresh_token",
 } as const;
 
-/** Multi-tenancy header expected by the Security service. */
-export const TENANT_HEADER = "X-Tenant-Id";
-
 /** Application route paths, centralised to avoid magic strings. */
 export const ROUTES = {
   home: "/",

@@ -21,7 +21,7 @@ import type {
 /**
  * Client-side auth API. Every call goes through {@link routeApi} to our own route
  * handlers (never the backend directly), so the browser has no knowledge of the
- * backend URL, bearer tokens, or the tenant header.
+ * backend URL or bearer tokens.
  */
 export const authApi = {
   register: (input: RegisterInput) =>
