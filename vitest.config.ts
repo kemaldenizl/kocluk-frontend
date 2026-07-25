@@ -19,7 +19,6 @@ export default defineConfig({
     include: ["tests/**/*.test.ts"],
     env: {
       BACKEND_API_URL: "http://backend.test",
-      DEFAULT_TENANT_ID: "00000000-0000-0000-0000-000000000001",
     },
   },
 });
