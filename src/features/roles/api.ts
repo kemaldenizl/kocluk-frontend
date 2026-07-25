@@ -1,13 +1,17 @@
 import { routeApi } from "@/lib/api/route-api";
-import type { CreateRoleInput, UpdateRoleInput } from "./schemas";
+import type { RoleNameInput, UpdateRoleInput } from "./schemas";
 import type { RoleResponse } from "./types";
 
-/** Client-side role admin API. All calls go through our own route handlers. */
+/**
+ * Client-side role admin API. Roles are tenant-scoped: listing and creation carry a
+ * `tenantId`, while by-id operations (rename/delete/permissions) resolve the tenant
+ * server-side from the role. All calls go through our own route handlers.
+ */
 export const rolesApi = {
-  list: () => routeApi<RoleResponse[]>("/api/roles"),
+  list: (tenantId: string) => routeApi<RoleResponse[]>("/api/roles", { query: { tenantId } }),
 
-  create: (input: CreateRoleInput) =>
-    routeApi<RoleResponse>("/api/roles", { method: "POST", body: input }),
+  create: (tenantId: string, input: RoleNameInput) =>
+    routeApi<RoleResponse>("/api/roles", { method: "POST", body: { tenantId, ...input } }),
 
   update: (id: string, input: UpdateRoleInput) =>
     routeApi<null>(`/api/roles/${id}`, { method: "PUT", body: input }),
