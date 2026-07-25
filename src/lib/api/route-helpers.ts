@@ -4,6 +4,22 @@ import { NextResponse } from "next/server";
 import type { ZodType } from "zod";
 import type { BackendResponse, ProblemDetails } from "./types";
 
+/**
+ * Rebuilds a `?key=value` query string from selected params of an incoming request,
+ * dropping absent ones. Used to pass tenant-scoping params (e.g. `tenantId`) straight
+ * through to the backend without letting arbitrary query keys leak.
+ */
+export function forwardQuery(request: Request, keys: readonly string[]): string {
+  const source = new URL(request.url).searchParams;
+  const out = new URLSearchParams();
+  for (const key of keys) {
+    const value = source.get(key);
+    if (value) out.set(key, value);
+  }
+  const qs = out.toString();
+  return qs ? `?${qs}` : "";
+}
+
 /** Forwards a backend response to the browser, preserving status and (204) empty bodies. */
 export function forward<T>(res: BackendResponse<T>): NextResponse {
   if (res.data === null || res.data === undefined) {

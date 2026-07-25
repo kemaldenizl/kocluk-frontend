@@ -1,9 +1,9 @@
 import { callBackendWithAuth } from "@/lib/auth/backend-auth";
-import { forward, readJson } from "@/lib/api/route-helpers";
+import { forward, forwardQuery, readJson } from "@/lib/api/route-helpers";
 import { createRoleSchema } from "@/features/roles/schemas";
 
-export async function GET() {
-  const res = await callBackendWithAuth("/api/roles");
+export async function GET(request: Request) {
+  const res = await callBackendWithAuth(`/api/roles${forwardQuery(request, ["tenantId"])}`);
   return forward(res);
 }
 

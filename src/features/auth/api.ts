@@ -32,6 +32,8 @@ export const authApi = {
 
   logout: () => routeApi<null>("/api/auth/logout", { method: "POST" }),
 
+  logoutAll: () => routeApi<null>("/api/auth/logout-all", { method: "POST" }),
+
   forgotPassword: (input: ForgotPasswordInput) =>
     routeApi<MessageResult>("/api/auth/forgot-password", { method: "POST", body: input }),
 

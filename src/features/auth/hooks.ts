@@ -30,6 +30,15 @@ export function useLogout() {
   });
 }
 
+/** Revokes every session for the user (all devices), then clears local cache. */
+export function useLogoutAll() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: authApi.logoutAll,
+    onSuccess: () => qc.clear(),
+  });
+}
+
 export function useForgotPassword() {
   return useMutation({ mutationFn: authApi.forgotPassword });
 }

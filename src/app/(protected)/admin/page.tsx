@@ -1,26 +1,29 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Building2, KeyRound, ShieldCheck } from "lucide-react";
+import { Building2, KeyRound, ShieldCheck, UsersRound } from "lucide-react";
 import type { LucideProps } from "lucide-react";
 import { Alert } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { getErrorMessage } from "@/lib/api/error-message";
 import {
+  canManageMembers,
   canManagePermissions,
   canManageRoles,
   canManageTenants,
+  canReadMembers,
   canReadPermissions,
   canReadRoles,
   canReadTenants,
 } from "@/config/permissions";
 import { useMe } from "@/features/profile/hooks";
 import { TenantsPanel } from "@/features/tenants/components/tenants-panel";
+import { MembersPanel } from "@/features/members/components/members-panel";
 import { RolesPanel } from "@/features/roles/components/roles-panel";
 import { PermissionsPanel } from "@/features/permissions/components/permissions-panel";
 
-type TabId = "tenants" | "roles" | "permissions";
+type TabId = "tenants" | "members" | "roles" | "permissions";
 type Tab = { id: TabId; label: string; icon: React.ComponentType<LucideProps>; render: () => React.ReactNode };
 
 /** Admin console — tenant, role, and permission management, gated per capability. */
@@ -37,6 +40,14 @@ export default function AdminPage() {
         label: "Kiracılar",
         icon: Building2,
         render: () => <TenantsPanel canManage={canManageTenants(perms)} />,
+      });
+    }
+    if (canReadMembers(perms)) {
+      list.push({
+        id: "members",
+        label: "Üyeler",
+        icon: UsersRound,
+        render: () => <MembersPanel canManage={canManageMembers(perms)} canReadRoles={canReadRoles(perms)} />,
       });
     }
     if (canReadRoles(perms)) {
@@ -65,7 +76,7 @@ export default function AdminPage() {
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-8">
       <header className="flex flex-col gap-1">
         <h1 className="t-h1">Yönetim</h1>
-        <p className="text-sm text-muted-foreground">Kiracıları, rolleri ve izinleri yönet.</p>
+        <p className="text-sm text-muted-foreground">Kiracıları, üyeleri, rolleri ve izinleri yönet.</p>
       </header>
 
       {isPending ? (
