@@ -29,7 +29,7 @@ export async function callBackendWithAuth<T = unknown>(
     return first;
   }
 
-  const tokens = await requestBackendRefresh(refreshToken, options.tenantId);
+  const tokens = await requestBackendRefresh(refreshToken);
   if (!tokens) {
     await clearSession();
     return first;

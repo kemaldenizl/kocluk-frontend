@@ -15,12 +15,10 @@ interface RefreshResponse {
  */
 export async function requestBackendRefresh(
   refreshToken: string,
-  tenantId?: string,
 ): Promise<TokenPair | null> {
   const res = await serverApi<RefreshResponse>("/api/auth/refresh", {
     method: "POST",
     body: { refreshToken },
-    tenantId,
   });
 
   if (!res.ok || !res.data?.tokens) return null;

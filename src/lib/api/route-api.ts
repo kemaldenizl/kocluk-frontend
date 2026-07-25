@@ -16,7 +16,7 @@ export interface RouteApiOptions {
  * JSON in/out, and non-2xx responses raised as a typed {@link ApiError} so
  * react-query and forms get a consistent error to react to. Route handlers proxy
  * onward to the backend via {@link serverApi}, so the browser never sees the
- * backend URL, tokens, or tenant header.
+ * backend URL or tokens.
  */
 export async function routeApi<T = unknown>(path: string, options: RouteApiOptions = {}): Promise<T> {
   const { method = "GET", body, query, headers = {}, signal } = options;

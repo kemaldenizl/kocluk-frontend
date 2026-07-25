@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { TENANT_HEADER } from "@/config/constants";
 import { serverApi } from "@/lib/api/server-api";
 
 function mockFetch(response: Response) {
@@ -14,7 +13,7 @@ afterEach(() => {
 });
 
 describe("serverApi", () => {
-  it("targets the backend base URL and sends the default tenant header", async () => {
+  it("targets the backend base URL without a tenant header", async () => {
     const fetchMock = mockFetch(new Response(JSON.stringify({ ok: true }), { status: 200 }));
 
     await serverApi("/api/users/me");
@@ -22,7 +21,7 @@ describe("serverApi", () => {
     const [url, init] = fetchMock.mock.calls[0];
     expect(url).toBe("http://backend.test/api/users/me");
     const headers = init!.headers as Record<string, string>;
-    expect(headers[TENANT_HEADER]).toBe("00000000-0000-0000-0000-000000000001");
+    expect(headers["X-Tenant-Id"]).toBeUndefined();
     expect(headers.Authorization).toBeUndefined();
   });
 

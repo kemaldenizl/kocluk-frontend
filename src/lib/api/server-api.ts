@@ -1,7 +1,6 @@
 import "server-only";
 
 import { env } from "@/config/env";
-import { TENANT_HEADER } from "@/config/constants";
 import type { BackendResponse, HttpMethod, ProblemDetails } from "./types";
 
 export interface ServerApiOptions {
@@ -10,8 +9,6 @@ export interface ServerApiOptions {
   body?: unknown;
   /** Bearer token for authenticated endpoints. */
   accessToken?: string;
-  /** Overrides the default/dev tenant when a request targets another tenant. */
-  tenantId?: string;
   /** Extra headers (rarely needed — kept for extensibility). */
   headers?: Record<string, string>;
   /** Forwarded to fetch for cache control; backend calls are non-cached by default. */
@@ -22,7 +19,7 @@ export interface ServerApiOptions {
 /**
  * The ONLY function that talks to the backend API Gateway.
  *
- * Server-only. Centralises base URL, tenant header, bearer auth, JSON handling and
+ * Server-only. Centralises base URL, bearer auth, JSON handling and
  * error normalisation so route handlers stay thin and every call is consistent
  * (DRY + single responsibility). It never throws on HTTP errors — the caller
  * inspects `ok`/`status` and forwards or reacts accordingly.
@@ -31,11 +28,10 @@ export async function serverApi<T = unknown>(
   path: string,
   options: ServerApiOptions = {},
 ): Promise<BackendResponse<T>> {
-  const { method = "GET", body, accessToken, tenantId, headers = {}, cache = "no-store", signal } = options;
+  const { method = "GET", body, accessToken, headers = {}, cache = "no-store", signal } = options;
 
   const requestHeaders: Record<string, string> = {
     Accept: "application/json",
-    [TENANT_HEADER]: tenantId ?? env.defaultTenantId,
     ...headers,
   };
 
