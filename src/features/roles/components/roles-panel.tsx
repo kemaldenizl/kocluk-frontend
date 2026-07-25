@@ -16,7 +16,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { applyFieldErrors } from "@/lib/api/apply-field-errors";
 import { getErrorMessage } from "@/lib/api/error-message";
 import { usePermissions } from "@/features/permissions/hooks";
-import { createRoleSchema, updateRoleSchema, type CreateRoleInput, type UpdateRoleInput } from "../schemas";
+import { useTenantScope } from "@/features/tenants/hooks";
+import { TenantSelect } from "@/features/tenants/components/tenant-select";
+import { roleNameSchema, updateRoleSchema, type RoleNameInput, type UpdateRoleInput } from "../schemas";
 import {
   useAddRolePermission,
   useCreateRole,
@@ -32,49 +34,57 @@ type RolesPanelProps = {
   canReadPermissions: boolean;
 };
 
-/** Role management: create/rename/delete roles and edit their granted permissions. */
+/** Role management: create/rename/delete a tenant's roles and edit their permissions. */
 export function RolesPanel({ canManage, canReadPermissions }: RolesPanelProps) {
-  const roles = useRoles();
+  const { tenants, tenantId, setTenantId } = useTenantScope();
+  const roles = useRoles(tenantId);
 
   return (
     <div className="flex flex-col gap-6">
-      {canManage ? <CreateRoleForm /> : null}
+      <TenantSelect tenants={tenants} value={tenantId} onChange={setTenantId} />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Roller</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {roles.isPending ? (
-            <ListSkeleton />
-          ) : roles.isError ? (
-            <Alert variant="error" title="Roller yüklenemedi">
-              {getErrorMessage(roles.error)}
-            </Alert>
-          ) : roles.data.length === 0 ? (
-            <EmptyState icon={ShieldCheck} title="Henüz rol yok" description="İlk rolü oluşturarak başla." />
-          ) : (
-            <ul className="flex flex-col gap-5">
-              {roles.data.map((role) => (
-                <RoleRow
-                  key={role.id}
-                  role={role}
-                  canManage={canManage}
-                  canReadPermissions={canReadPermissions}
-                />
-              ))}
-            </ul>
-          )}
-        </CardContent>
-      </Card>
+      {tenantId ? (
+        <>
+          {canManage ? <CreateRoleForm tenantId={tenantId} /> : null}
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Roller</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {roles.isPending ? (
+                <ListSkeleton />
+              ) : roles.isError ? (
+                <Alert variant="error" title="Roller yüklenemedi">
+                  {getErrorMessage(roles.error)}
+                </Alert>
+              ) : roles.data.length === 0 ? (
+                <EmptyState icon={ShieldCheck} title="Henüz rol yok" description="İlk rolü oluşturarak başla." />
+              ) : (
+                <ul className="flex flex-col gap-5">
+                  {roles.data.map((role) => (
+                    <RoleRow
+                      key={role.id}
+                      tenantId={tenantId}
+                      role={role}
+                      canManage={canManage}
+                      canReadPermissions={canReadPermissions}
+                    />
+                  ))}
+                </ul>
+              )}
+            </CardContent>
+          </Card>
+        </>
+      ) : null}
     </div>
   );
 }
 
-function CreateRoleForm() {
-  const create = useCreateRole();
-  const form = useForm<CreateRoleInput>({
-    resolver: zodResolver(createRoleSchema),
+function CreateRoleForm({ tenantId }: { tenantId: string }) {
+  const create = useCreateRole(tenantId);
+  const form = useForm<RoleNameInput>({
+    resolver: zodResolver(roleNameSchema),
     defaultValues: { name: "" },
   });
 
@@ -99,7 +109,7 @@ function CreateRoleForm() {
           <div className="flex-1">
             <Field
               label="Ad"
-              placeholder="Editör"
+              placeholder="Danışman"
               {...form.register("name")}
               error={form.formState.errors.name?.message ?? form.formState.errors.root?.message}
             />
@@ -116,11 +126,16 @@ function CreateRoleForm() {
   );
 }
 
-function RoleRow({ role, canManage, canReadPermissions }: { role: RoleResponse } & RolesPanelProps) {
+function RoleRow({
+  tenantId,
+  role,
+  canManage,
+  canReadPermissions,
+}: { tenantId: string; role: RoleResponse } & RolesPanelProps) {
   const [editing, setEditing] = useState(false);
-  const update = useUpdateRole();
-  const remove = useDeleteRole();
-  const removePermission = useRemoveRolePermission();
+  const update = useUpdateRole(tenantId);
+  const remove = useDeleteRole(tenantId);
+  const removePermission = useRemoveRolePermission(tenantId);
 
   const form = useForm<UpdateRoleInput>({
     resolver: zodResolver(updateRoleSchema),
@@ -213,15 +228,15 @@ function RoleRow({ role, canManage, canReadPermissions }: { role: RoleResponse }
           <p className="text-sm text-muted-foreground">Bu role atanmış izin yok.</p>
         )}
 
-        {canManage && canReadPermissions ? <AddPermission role={role} /> : null}
+        {canManage && canReadPermissions ? <AddPermission tenantId={tenantId} role={role} /> : null}
       </div>
     </li>
   );
 }
 
-function AddPermission({ role }: { role: RoleResponse }) {
+function AddPermission({ tenantId, role }: { tenantId: string; role: RoleResponse }) {
   const [selected, setSelected] = useState("");
-  const add = useAddRolePermission();
+  const add = useAddRolePermission(tenantId);
   const permissions = usePermissions();
 
   const assignedIds = useMemo(() => new Set(role.permissions.map((p) => p.id)), [role.permissions]);

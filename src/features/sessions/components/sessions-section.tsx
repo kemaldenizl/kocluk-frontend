@@ -1,6 +1,7 @@
 "use client";
 
-import { Monitor } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { LogOut, Monitor } from "lucide-react";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,14 +10,28 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getErrorMessage } from "@/lib/api/error-message";
 import { formatDateTime } from "@/lib/utils";
+import { ROUTES } from "@/config/constants";
+import { useLogoutAll } from "@/features/auth/hooks";
 import { useRevokeSession, useSessions } from "../hooks";
 
 /** Lists the user's active sessions and lets them revoke any but the current one. */
 export function SessionsSection() {
+  const router = useRouter();
   const sessions = useSessions();
   const revoke = useRevokeSession();
+  const logoutAll = useLogoutAll();
 
   const active = sessions.data?.filter((s) => !s.revoked) ?? [];
+
+  const onLogoutAll = async () => {
+    try {
+      await logoutAll.mutateAsync();
+    } finally {
+      // The current session is revoked too — send the user back to login either way.
+      router.replace(ROUTES.login);
+      router.refresh();
+    }
+  };
 
   return (
     <Card>
@@ -73,6 +88,28 @@ export function SessionsSection() {
             ))}
           </ul>
         )}
+
+        <div className="mt-6 flex flex-col gap-3 border-t border-border pt-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-0.5">
+              <p className="text-sm font-medium">Tüm cihazlardan çıkış yap</p>
+              <p className="text-xs text-muted-foreground">
+                Bu oturum dahil tüm oturumlar sonlandırılır ve yeniden giriş yapman gerekir.
+              </p>
+            </div>
+            <ConfirmButton
+              onConfirm={onLogoutAll}
+              loading={logoutAll.isPending}
+              confirmLabel="Tümünden çık"
+              triggerVariant="outline"
+              className="shrink-0"
+            >
+              <LogOut className="size-4" />
+              Tüm hesaplardan çıkış yap
+            </ConfirmButton>
+          </div>
+          {logoutAll.isError ? <Alert variant="error">{getErrorMessage(logoutAll.error)}</Alert> : null}
+        </div>
       </CardContent>
     </Card>
   );
