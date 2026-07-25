@@ -20,5 +20,11 @@ export default defineConfig({
     env: {
       BACKEND_API_URL: "http://backend.test",
     },
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "html", "lcov"],
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: ["src/**/*.d.ts", "src/**/{layout,page,loading,error,not-found}.tsx"],
+    },
   },
 });

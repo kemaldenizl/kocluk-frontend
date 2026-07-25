@@ -1,0 +1,18 @@
+name: Setup Node & Dependencies
+description: >
+  Sets up Node.js from .nvmrc and installs dependencies with a clean,
+  cache-backed `npm ci`. The caller is responsible for checking out the repo
+  first (actions/checkout). Keeps the workflow DRY across parallel jobs.
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: .nvmrc
+        cache: npm
+
+    - name: Install dependencies
+      shell: bash
+      run: npm ci
