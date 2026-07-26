@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { serverApi } from "@/lib/api/server-api";
 import { readJson, forward } from "@/lib/api/route-helpers";
 import { persistSession } from "@/lib/auth/session";
+import { setMfaEnabled } from "@/lib/auth/mfa-state";
 import { loginSchema } from "@/features/auth/schemas";
 import type { ClientLoginResult, LoginResult } from "@/features/auth/types";
 
@@ -26,6 +27,8 @@ export async function POST(request: Request) {
 
   if (tokens && !requiresEmailVerification) {
     await persistSession(tokens);
+    // A session issued without an MFA challenge means MFA is off for this account.
+    await setMfaEnabled(false);
   }
 
   const body: ClientLoginResult = { user, requiresMfa, mfaChallenge, requiresEmailVerification };
