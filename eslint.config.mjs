@@ -12,7 +12,19 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Generated / tooling output.
+    "coverage/**",
+    "test-results/**",
+    "playwright-report/**",
   ]),
+  {
+    // Tests are not React code. Playwright's fixture API takes a `use` callback that
+    // the react-hooks plugin mistakes for the React `use` hook — disable that rule here.
+    files: ["tests/**"],
+    rules: {
+      "react-hooks/rules-of-hooks": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;
