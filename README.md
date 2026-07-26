@@ -1,77 +1,77 @@
 # Koçluk Frontend
 
-[Next.js](https://nextjs.org) (App Router) + React 19 + TypeScript + Tailwind CSS ile geliştirilen web uygulaması.
+A web application built with [Next.js](https://nextjs.org) (App Router) + React 19 + TypeScript + Tailwind CSS.
 
-## Gereksinimler
+## Requirements
 
-- **Node.js 22** (proje [`.nvmrc`](.nvmrc) ile sabitlenmiştir — `nvm use` yeterli)
-- **npm** (repo `package-lock.json` kullanır)
-- Çalışan bir **backend API** (varsayılan: `http://localhost:8080`)
+- **Node.js 22** (pinned via [`.nvmrc`](.nvmrc) — `nvm use` is enough)
+- **npm** (the repo uses `package-lock.json`)
+- A running **backend API** (default: `http://localhost:8080`)
 
-## Kurulum
+## Setup
 
-Projeyi ilk kez çalıştırıyorsan sırayla:
+If you're running the project for the first time, follow these steps in order:
 
 ```bash
-# 1. Repoyu klonla
+# 1. Clone the repo
 git clone https://github.com/kemaldenizl/kocluk-frontend.git
 cd kocluk-frontend
 
-# 2. Doğru Node sürümüne geç
-nvm use          # yoksa: nvm install 22
+# 2. Switch to the correct Node version
+nvm use          # if missing: nvm install 22
 
-# 3. Bağımlılıkları kur
+# 3. Install dependencies
 npm ci
 
-# 4. Ortam değişkenlerini ayarla
+# 4. Configure environment variables
 cp .env.example .env.local
-# .env.local içindeki BACKEND_API_URL'i kendi backend adresinle güncelle
+# Update BACKEND_API_URL in .env.local with your own backend address
 ```
 
-## Geliştirme
+## Development
 
 ```bash
 npm run dev
 ```
 
-[http://localhost:3000](http://localhost:3000) adresini aç. Dosyaları kaydettikçe sayfa otomatik güncellenir.
+Open [http://localhost:3000](http://localhost:3000). The page updates automatically as you save files.
 
 ## Production
 
 ```bash
-npm run build    # optimize edilmiş üretim derlemesi
-npm run start    # derlemeyi çalıştırır (varsayılan: http://localhost:3000)
+npm run build    # optimized production build
+npm run start    # runs the build (default: http://localhost:3000)
 ```
 
-> **Not:** `npm run start`, önce `npm run build` çalıştırılmasını gerektirir.
-> Production'da `BACKEND_API_URL` ortam değişkeninin tanımlı olması zorunludur.
+> **Note:** `npm run start` requires `npm run build` to be run first.
+> In production, the `BACKEND_API_URL` environment variable must be defined.
 
-## Faydalı komutlar
+## Useful commands
 
-| Komut                   | Açıklama                                  |
+| Command                 | Description                               |
 | ----------------------- | ----------------------------------------- |
-| `npm run dev`           | Geliştirme sunucusu (hot reload)          |
-| `npm run build`         | Production derlemesi                      |
-| `npm run start`         | Production sunucusu (build sonrası)       |
-| `npm run lint`          | ESLint ile kod kontrolü                   |
-| `npm run typecheck`     | TypeScript tip kontrolü                   |
-| `npm run test`          | Testleri çalıştırır                       |
-| `npm run test:coverage` | Testleri coverage raporuyla çalıştırır    |
+| `npm run dev`           | Development server (hot reload)           |
+| `npm run build`         | Production build                          |
+| `npm run start`         | Production server (after build)           |
+| `npm run lint`          | Lint code with ESLint                     |
+| `npm run typecheck`     | TypeScript type checking                  |
+| `npm run test`          | Run the tests                             |
+| `npm run test:coverage` | Run the tests with a coverage report      |
 
-## Ortam değişkenleri
+## Environment variables
 
-| Değişken          | Zorunlu | Açıklama                                                        |
-| ----------------- | ------- | -------------------------------------------------------------- |
-| `BACKEND_API_URL` | Evet    | Backend API adresi. **Sadece sunucu tarafında** kullanılır, tarayıcıya sızmaz. |
+| Variable          | Required | Description                                                     |
+| ----------------- | -------- | -------------------------------------------------------------- |
+| `BACKEND_API_URL` | Yes      | Backend API address. Used **only on the server side**; never exposed to the browser. |
 
-## CI/CD ve Deploy
+## CI/CD and Deploy
 
-- Her pull request ve `main`'e push'ta **GitHub Actions** çalışır: lint, tip kontrolü, test ve build.
-- Deploy **Vercel** üzerinden otomatiktir: PR'lar için preview, `main`'e merge'te production.
-- Detaylar için: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
+- **GitHub Actions** runs on every pull request and push to `main`: lint, type checking, tests, and build.
+- Deployment is automated via **Vercel**: previews for PRs, production on merge to `main`.
+- For details: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 
-## Uyarılar
+## Warnings
 
-- `.env.local` **asla commit'lenmez** (git tarafından yok sayılır). Gizli bilgiler için kullan.
-- `BACKEND_API_URL` yalnızca sunucu tarafı içindir; tarayıcıya açılan bir değişken olarak eklemeyin.
-- Bağımlılık kurarken `npm install` yerine `npm ci` tercih edin — lock dosyasıyla birebir, tekrarlanabilir kurulum sağlar.
+- `.env.local` is **never committed** (ignored by git). Use it for secrets.
+- `BACKEND_API_URL` is for server-side use only; do not add it as a browser-exposed variable.
+- When installing dependencies, prefer `npm ci` over `npm install` — it provides an exact, reproducible install that matches the lock file.
