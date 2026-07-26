@@ -11,6 +11,7 @@ import { applyFieldErrors } from "@/lib/api/apply-field-errors";
 import { getErrorMessage } from "@/lib/api/error-message";
 import { REDIRECT_PARAM, ROUTES } from "@/config/constants";
 import { loginSchema, type LoginInput } from "../schemas";
+import { setPendingVerificationEmail } from "../pending-verification";
 import { useLogin } from "../hooks";
 
 export function LoginForm() {
@@ -26,6 +27,12 @@ export function LoginForm() {
   const onSubmit = form.handleSubmit(async (values) => {
     try {
       const result = await login.mutateAsync(values);
+      if (result.requiresEmailVerification) {
+        // No session was issued; hand the email to the notice page (out of the URL).
+        setPendingVerificationEmail(values.email);
+        router.replace(ROUTES.verifyEmailNotice);
+        return;
+      }
       if (result.requiresMfa) {
         form.setError("root", { message: "Bu hesap için iki adımlı doğrulama gerekli (henüz eklenmedi)." });
         return;

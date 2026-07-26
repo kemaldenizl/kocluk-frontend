@@ -16,6 +16,8 @@ export const ROUTES = {
   forgotPassword: "/forgot-password",
   resetPassword: "/reset-password",
   verifyEmail: "/verify-email",
+  /** Post-login gate shown when the account's email is not yet verified. */
+  verifyEmailNotice: "/verify-email-required",
   resendVerification: "/resend-verification",
   profile: "/profile",
   admin: "/admin",
@@ -32,3 +34,10 @@ export const AUTH_ROUTES: readonly string[] = [ROUTES.login, ROUTES.register];
 
 /** Query-string key used to remember where the user was heading before login. */
 export const REDIRECT_PARAM = "from";
+
+/**
+ * sessionStorage key holding the email of an account awaiting verification, handed
+ * from the login/register step to the verification notice. Kept out of the URL so the
+ * address (personal data) never lands in query strings or history.
+ */
+export const PENDING_VERIFICATION_EMAIL_KEY = "kocluk.pendingVerificationEmail";

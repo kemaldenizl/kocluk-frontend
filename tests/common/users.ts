@@ -33,6 +33,15 @@ export const TEST_USERS = {
     studentTypeLabel: "Mezun",
     isAdmin: true,
   },
+  /** A student whose email is not verified — login must be gated to the notice page. */
+  unverified: {
+    email: "unverified@test.local",
+    password: "Password12345",
+    firstName: "Doğrulanmamış",
+    lastName: "Kullanıcı",
+    studentTypeLabel: "Lise",
+    isAdmin: false,
+  },
 } as const satisfies Record<string, TestUser>;
 
 /** A password that satisfies the 12-char minimum, for new registrations. */

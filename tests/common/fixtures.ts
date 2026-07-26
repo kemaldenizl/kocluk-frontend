@@ -5,6 +5,7 @@ import { RegisterPage } from "../e2e/pages/register.page";
 import { ForgotPasswordPage } from "../e2e/pages/forgot-password.page";
 import { ProfilePage } from "../e2e/pages/profile.page";
 import { AdminPage } from "../e2e/pages/admin.page";
+import { VerifyEmailPage } from "../e2e/pages/verify-email.page";
 import type { TestUser } from "./users";
 
 /**
@@ -22,6 +23,7 @@ interface Pages {
   forgotPasswordPage: ForgotPasswordPage;
   profilePage: ProfilePage;
   adminPage: AdminPage;
+  verifyEmailPage: VerifyEmailPage;
 }
 
 interface Helpers {
@@ -51,6 +53,9 @@ export const test = base.extend<Pages & Helpers>({
   },
   adminPage: async ({ page }, use) => {
     await use(new AdminPage(page));
+  },
+  verifyEmailPage: async ({ page }, use) => {
+    await use(new VerifyEmailPage(page));
   },
 
   signIn: async ({ page }, use) => {

@@ -10,6 +10,7 @@ import { applyFieldErrors } from "@/lib/api/apply-field-errors";
 import { getErrorMessage } from "@/lib/api/error-message";
 import { STUDENT_TYPE_OPTIONS } from "@/config/student-type";
 import { registerSchema, type RegisterInput } from "../schemas";
+import { ResendVerificationButton } from "./resend-verification-button";
 import { useRegister } from "../hooks";
 
 export function RegisterForm() {
@@ -39,10 +40,16 @@ export function RegisterForm() {
 
   if (register.isSuccess) {
     return (
-      <Alert variant="success" title="Hesabın oluşturuldu">
-        <strong className="text-foreground">{register.data.user.email}</strong> adresine bir doğrulama bağlantısı
-        gönderdik. Kurulumu tamamlamak için gelen kutunu kontrol et.
-      </Alert>
+      <div className="flex flex-col gap-5">
+        <Alert variant="success" title="Hesabın oluşturuldu">
+          <strong className="text-foreground">{register.data.user.email}</strong> adresine bir doğrulama bağlantısı
+          gönderdik. Kurulumu tamamlamak için gelen kutunu kontrol et.
+        </Alert>
+        <div className="flex flex-col gap-2">
+          <p className="text-sm text-muted-foreground">E-posta gelmediyse tekrar gönderebilirsin.</p>
+          <ResendVerificationButton email={register.data.user.email} />
+        </div>
+      </div>
     );
   }
 

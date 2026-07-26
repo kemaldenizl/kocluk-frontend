@@ -9,6 +9,10 @@ import type { ClientLoginResult, LoginResult } from "@/features/auth/types";
  * Exchanges credentials for a session. On success the token pair is stored in
  * httpOnly cookies server-side and stripped from the response, so the browser only
  * ever sees the user + MFA state — never the tokens.
+ *
+ * Email verification is enforced here: an account whose email is unverified never
+ * receives a session (cookies are withheld even if the backend issued tokens). The
+ * client is told via `requiresEmailVerification` to route the user to verification.
  */
 export async function POST(request: Request) {
   const { data, error } = await readJson(request, loginSchema);
@@ -18,10 +22,12 @@ export async function POST(request: Request) {
   if (!res.ok) return forward(res);
 
   const { user, tokens, requiresMfa, mfaChallenge } = res.data;
-  if (tokens) {
+  const requiresEmailVerification = !user.emailVerified;
+
+  if (tokens && !requiresEmailVerification) {
     await persistSession(tokens);
   }
 
-  const body: ClientLoginResult = { user, requiresMfa, mfaChallenge };
+  const body: ClientLoginResult = { user, requiresMfa, mfaChallenge, requiresEmailVerification };
   return NextResponse.json(body, { status: 200 });
 }
