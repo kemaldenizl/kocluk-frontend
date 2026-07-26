@@ -114,13 +114,17 @@ describe("persistSession / clearSession", () => {
     expect(accessCall[2]).toMatchObject({ httpOnly: true, sameSite: "lax", path: "/" });
   });
 
-  it("clears both cookies with an empty value", async () => {
+  it("clears the auth cookies and the MFA hint with empty, expired values", async () => {
     const { clearSession } = await import("@/lib/auth/session");
     await clearSession();
-    expect(setSpy).toHaveBeenCalledTimes(2);
+    // access + refresh + the mfa_enabled hint are all cleared.
+    expect(setSpy).toHaveBeenCalledTimes(3);
     expect(store.get("access_token")?.value).toBe("");
     expect(store.get("refresh_token")?.value).toBe("");
+    expect(store.get("mfa_enabled")?.value).toBe("");
     const call = setSpy.mock.calls.find((c) => c[0] === "access_token")!;
     expect(call[2]).toMatchObject({ maxAge: 0 });
+    const mfaCall = setSpy.mock.calls.find((c) => c[0] === "mfa_enabled")!;
+    expect(mfaCall[2]).toMatchObject({ maxAge: 0, httpOnly: true });
   });
 });
