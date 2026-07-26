@@ -3,6 +3,7 @@ import { ProfileOverview } from "@/features/profile/components/profile-overview"
 import { ProfileDetailsSection } from "@/features/profile/components/profile-details-section";
 import { ChangeEmailSection } from "@/features/profile/components/change-email-section";
 import { ChangePasswordSection } from "@/features/profile/components/change-password-section";
+import { MfaSummaryCard } from "@/features/mfa/components/mfa-summary-card";
 import { SessionsSection } from "@/features/sessions/components/sessions-section";
 
 export const metadata: Metadata = { title: "Hesap" };
@@ -21,6 +22,7 @@ export default function ProfilePage() {
         <ProfileDetailsSection />
         <ChangeEmailSection />
         <ChangePasswordSection />
+        <MfaSummaryCard />
         <SessionsSection />
       </div>
     </div>

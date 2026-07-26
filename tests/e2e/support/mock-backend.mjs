@@ -56,6 +56,11 @@ function seed() {
     firstName: "Admin", lastName: "Koç", studentType: "Graduate",
     emailVerified: true, isActive: true, permissions: ADMIN_PERMISSIONS,
   });
+  addUser({
+    userId: "u-unverified", email: "unverified@test.local", password: PASSWORD,
+    firstName: "Doğrulanmamış", lastName: "Kullanıcı", studentType: "HighSchool",
+    emailVerified: false, isActive: true, permissions: [],
+  });
 }
 seed();
 

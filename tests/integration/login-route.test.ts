@@ -59,9 +59,46 @@ describe("POST /api/auth/login (integration)", () => {
     expect(body.tokens).toBeUndefined();
     expect(body.user.email).toBe("user@example.com");
     expect(body.requiresMfa).toBe(false);
+    expect(body.requiresEmailVerification).toBe(false);
     // Tokens live in httpOnly cookies instead.
     expect(cookieStore.get("access_token")?.value).toBe("access.jwt");
     expect(cookieStore.get("refresh_token")?.value).toBe("refresh.token");
+  });
+
+  it("withholds the session for an unverified account and flags verification", async () => {
+    const backendPayload = {
+      // Backend issued tokens, but the email is not yet verified.
+      user: { id: "u1", email: "unverified@example.com", emailVerified: false, isActive: true },
+      tokens: {
+        accessToken: "access.jwt",
+        accessTokenExpiresAtUtc: new Date(Date.now() + 15 * 60_000).toISOString(),
+        refreshToken: "refresh.token",
+        refreshTokenExpiresAtUtc: new Date(Date.now() + 7 * 24 * 3600_000).toISOString(),
+      },
+      mfaChallenge: null,
+      requiresMfa: false,
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof fetch>().mockResolvedValue(new Response(JSON.stringify(backendPayload), { status: 200 })),
+    );
+
+    const { POST } = await import("@/app/api/auth/login/route");
+    const request = new Request("http://localhost/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: "unverified@example.com", password: "P@ssw0rd12345" }),
+    });
+
+    const response = await POST(request);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.requiresEmailVerification).toBe(true);
+    expect(body.user.email).toBe("unverified@example.com");
+    // Crucially: no session is persisted, even though the backend returned tokens.
+    expect(cookieStore.has("access_token")).toBe(false);
+    expect(cookieStore.has("refresh_token")).toBe(false);
   });
 
   it("forwards backend validation errors without setting cookies", async () => {

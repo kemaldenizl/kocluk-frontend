@@ -10,7 +10,9 @@ import { Alert } from "@/components/ui/alert";
 import { applyFieldErrors } from "@/lib/api/apply-field-errors";
 import { getErrorMessage } from "@/lib/api/error-message";
 import { REDIRECT_PARAM, ROUTES } from "@/config/constants";
+import { setPendingMfaChallenge } from "@/features/mfa/challenge-store";
 import { loginSchema, type LoginInput } from "../schemas";
+import { setPendingVerificationEmail } from "../pending-verification";
 import { useLogin } from "../hooks";
 
 export function LoginForm() {
@@ -26,11 +28,19 @@ export function LoginForm() {
   const onSubmit = form.handleSubmit(async (values) => {
     try {
       const result = await login.mutateAsync(values);
-      if (result.requiresMfa) {
-        form.setError("root", { message: "Bu hesap için iki adımlı doğrulama gerekli (henüz eklenmedi)." });
+      const target = searchParams.get(REDIRECT_PARAM) || ROUTES.profile;
+      if (result.requiresEmailVerification) {
+        // No session was issued; hand the email to the notice page (out of the URL).
+        setPendingVerificationEmail(values.email);
+        router.replace(ROUTES.verifyEmailNotice);
         return;
       }
-      const target = searchParams.get(REDIRECT_PARAM) || ROUTES.profile;
+      if (result.requiresMfa && result.mfaChallenge) {
+        // No session yet — hand the challenge to the MFA page (kept out of the URL).
+        setPendingMfaChallenge({ ...result.mfaChallenge, redirectTo: target });
+        router.replace(ROUTES.mfaChallenge);
+        return;
+      }
       router.replace(target);
       // Re-render server components (e.g. the auth-aware header) with the new session.
       router.refresh();

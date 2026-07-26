@@ -29,6 +29,12 @@ export interface LoginResult {
 export interface ClientLoginResult {
   user: AuthUser;
   requiresMfa: boolean;
+  /**
+   * True when the account's email is not yet verified. In that case the BFF withholds
+   * the session (no cookies set) and the client must route the user to verification
+   * instead of an authenticated area.
+   */
+  requiresEmailVerification: boolean;
   mfaChallenge: MfaChallenge | null;
 }
 

@@ -15,4 +15,6 @@ export const queryKeys = {
   /** The current user's own memberships. */
   myMemberships: ["memberships", "me"] as const,
   sessions: ["sessions"] as const,
+  /** Whether the current session's account has MFA enabled (BFF-tracked hint). */
+  mfaStatus: ["mfa", "status"] as const,
 } as const;
