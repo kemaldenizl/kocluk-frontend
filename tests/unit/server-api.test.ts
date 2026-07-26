@@ -62,4 +62,22 @@ describe("serverApi", () => {
     expect(res.status).toBe(503);
     expect(res.ok).toBe(false);
   });
+
+  it("wraps an unexpected non-JSON success body into a problem-shaped object", async () => {
+    mockFetch(new Response("<html>ok</html>", { status: 200 }));
+
+    const res = await serverApi("/api/users/me");
+
+    expect(res.ok).toBe(true);
+    expect(res.status).toBe(200);
+    expect(res.data).toMatchObject({ title: "Unexpected response", status: 200, detail: "<html>ok</html>" });
+  });
+
+  it("returns null data for an empty (no-content) 200 body", async () => {
+    mockFetch(new Response("", { status: 200 }));
+
+    const res = await serverApi("/api/users/me");
+
+    expect(res.data).toBeNull();
+  });
 });
