@@ -6,6 +6,12 @@
 export const COOKIE_NAMES = {
   accessToken: "access_token",
   refreshToken: "refresh_token",
+  /**
+   * UI hint recording whether the current session's account has MFA enabled. The
+   * backend exposes no MFA-status endpoint, so the BFF tracks it here and keeps it
+   * in sync at every session-creation point (see `src/lib/auth/mfa-state.ts`).
+   */
+  mfaEnabled: "mfa_enabled",
 } as const;
 
 /** Application route paths, centralised to avoid magic strings. */
@@ -20,6 +26,10 @@ export const ROUTES = {
   verifyEmailNotice: "/verify-email-required",
   resendVerification: "/resend-verification",
   profile: "/profile",
+  /** Two-step verification (MFA) management, reached from the profile page. */
+  mfa: "/profile/mfa",
+  /** Post-login step shown when an MFA-enabled account must complete a TOTP challenge. */
+  mfaChallenge: "/mfa-challenge",
   admin: "/admin",
   /** Token-based confirmation pages reached from an email link (?token=...). */
   changeEmail: "/change-email",
@@ -41,3 +51,10 @@ export const REDIRECT_PARAM = "from";
  * address (personal data) never lands in query strings or history.
  */
 export const PENDING_VERIFICATION_EMAIL_KEY = "kocluk.pendingVerificationEmail";
+
+/**
+ * sessionStorage key holding the pending MFA login challenge, handed from the login
+ * step to the MFA challenge page. Kept out of the URL so the opaque challenge token
+ * never lands in query strings, history, or referrer headers.
+ */
+export const MFA_CHALLENGE_KEY = "kocluk.mfaChallenge";

@@ -3,6 +3,7 @@ import "server-only";
 import { cookies } from "next/headers";
 import { COOKIE_NAMES } from "@/config/constants";
 import { buildAuthCookies, buildClearAuthCookies, type TokenPair } from "./tokens";
+import { clearMfaState } from "./mfa-state";
 
 /**
  * Server-side session store backed by httpOnly cookies. Used inside route handlers
@@ -48,10 +49,11 @@ export async function persistSession(tokens: TokenPair): Promise<void> {
   }
 }
 
-/** Clears the session cookies (logout / invalid refresh). */
+/** Clears the session cookies plus the MFA hint (logout / invalid refresh). */
 export async function clearSession(): Promise<void> {
   const store = await cookies();
   for (const { name, value, options } of buildClearAuthCookies()) {
     store.set(name, value, options);
   }
+  await clearMfaState();
 }
